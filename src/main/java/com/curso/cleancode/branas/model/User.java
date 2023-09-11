@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "passenger")
+@Entity(name = "user")
 @Builder
-public class Passenger {
+public class User {
     @Id
     @Column(name = "account_id")
     private String accountId;
@@ -23,4 +23,6 @@ public class Passenger {
     private String nome;
     @Column(name = "cpf")
     private String cpf;
+    @Column(name = "is_passenger")
+    private Boolean isPassenger;
 }
