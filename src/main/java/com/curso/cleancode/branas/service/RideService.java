@@ -9,19 +9,19 @@ import com.curso.cleancode.branas.exceptions.UserException;
 import com.curso.cleancode.branas.model.Ride;
 import com.curso.cleancode.branas.model.User;
 import com.curso.cleancode.branas.repository.RideRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 
 @Service
 public class RideService {
 
-    @Autowired
-    RideRepository rideRepository;
-    @Autowired
-    UserService userService;
+    private final RideRepository rideRepository;
+    private final UserService userService;
 
+    RideService(RideRepository rideRepository, UserService userService) {
+        this.rideRepository = rideRepository;
+        this.userService = userService;
+    }
 
     public String requestRide(RequestRideDTO requestRideDTO) {
         this.checkIsPassenger(requestRideDTO.getPassengerId());
@@ -29,6 +29,24 @@ public class RideService {
         Ride ride = RequestRideDTO.parseToEntity(requestRideDTO);
         rideRepository.save(ride);
         return ride.getRideId();
+    }
+
+    public void acceptRide(AcceptRideDTO acceptRideDTO) {
+        this.checkIsDriver(acceptRideDTO.getAccountId());
+        this.checkDriverIsFree(acceptRideDTO.getAccountId());
+        this.checkValidRideStatus(acceptRideDTO.getRideId());
+        Ride ride = this.getRide(acceptRideDTO.getRideId());
+        ride.setRideStatus(RideStatusEnum.STATUS_ACCEPTED.getRideStatus());
+        ride.setDriverAccountId(acceptRideDTO.getAccountId());
+        rideRepository.save(ride);
+        this.startRide(acceptRideDTO.getRideId());
+    }
+
+    private void startRide(String rideId) {
+        Ride ride = this.getRide(rideId);
+        this.isInProgressRide(ride);
+        ride.setRideStatus(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus());
+        rideRepository.save(ride);
     }
 
     private void checkIsPassenger(String accountId) {
@@ -43,16 +61,6 @@ public class RideService {
         if(rides>0) {
             throw new RideException("O passageiro possui corridas pendentes ou em execução");
         }
-    }
-
-    public void acceptRide(AcceptRideDTO acceptRideDTO) {
-        this.checkIsDriver(acceptRideDTO.getAccountId());
-        this.checkDriverIsFree(acceptRideDTO.getAccountId());
-        this.checkValidRideStatus(acceptRideDTO.getRideId());
-        Ride ride = this.getRide(acceptRideDTO.getRideId());
-        ride.setRideStatus(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus());
-        ride.setDriverAccountId(acceptRideDTO.getAccountId());
-        rideRepository.save(ride);
     }
 
     public Ride getRide(String rideId) {
@@ -80,6 +88,12 @@ public class RideService {
         ride.orElseThrow(() -> new RideNotFoundException("A corrida escolhida não existe"));
         if(!(ride.get().getRideStatus().equals(RideStatusEnum.STATUS_REQUESTED.getRideStatus()))) {
             throw new RideException("Não é possível aceitar uma corrida em progresso ou encerrada");
+        }
+    }
+
+    public void isInProgressRide(Ride ride) {
+        if(!ride.getRideStatus().equals(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus())) {
+            throw new RideException("Falha ao realizar operação. A corrida deve estar em progresso");
         }
     }
 }

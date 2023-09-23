@@ -6,13 +6,9 @@ import com.curso.cleancode.branas.dto.ride.RequestRideDTO;
 import com.curso.cleancode.branas.model.Ride;
 import com.curso.cleancode.branas.service.RideService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,8 +17,11 @@ import java.util.Map;
 @RequestMapping("/ride")
 public class RideController {
 
-    @Autowired
-    RideService rideService;
+    private final RideService rideService;
+
+    RideController(RideService rideService) {
+        this.rideService = rideService;
+    }
 
     @PostMapping("/request")
     private ResponseEntity<?> requestRide(@Valid @RequestBody RequestRideDTO requestRideDTO) {
@@ -33,9 +32,9 @@ public class RideController {
     }
 
     @PostMapping("/accept")
-    private ResponseEntity<?> acceptRide(@Valid @RequestBody AcceptRideDTO acceptRideDTO) {
+    @ResponseStatus(HttpStatus.OK)
+    private void acceptRide(@Valid @RequestBody AcceptRideDTO acceptRideDTO) {
         rideService.acceptRide(acceptRideDTO);
-        return ResponseEntity.ok().body(null);
     }
 
     @PostMapping("/getRide")

@@ -1,6 +1,8 @@
 package com.curso.cleancode.branas.utils;
 
-public abstract class RideUtils {
+public final class RideUtils {
+
+    private RideUtils() {}
 
     public static Float calculateKilometerDistance(Double fromLat, Double fromLong, Double toLat, Double toLong) {
         double theta = fromLong - toLong;

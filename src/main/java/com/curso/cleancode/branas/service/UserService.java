@@ -6,7 +6,6 @@ import com.curso.cleancode.branas.exceptions.UserException;
 import com.curso.cleancode.branas.exceptions.UserNotFoundException;
 import com.curso.cleancode.branas.model.User;
 import com.curso.cleancode.branas.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,8 +15,11 @@ import java.util.regex.Pattern;
 @Service
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public void createPassenger(CreateUserDTO createUserDTO) {
         this.validateWithRegex(createUserDTO.getNome(), RegexEnum.VALIDATE_NAME_CARACTERS);

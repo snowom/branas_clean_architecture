@@ -5,6 +5,7 @@ import lombok.Getter;
 public enum RideStatusEnum {
 
     STATUS_REQUESTED("requested"),
+    STATUS_ACCEPTED("accepted"),
     STATUS_IN_PROGRESS("in_progress"),
     STATUS_COMPLETED("completed");
 

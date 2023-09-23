@@ -5,7 +5,6 @@ import com.curso.cleancode.branas.dto.user.GetUserDTO;
 import com.curso.cleancode.branas.model.User;
 import com.curso.cleancode.branas.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -17,8 +16,11 @@ import java.util.HashMap;
 @RequestMapping(path = "/user")
 public class UserController {
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+
+    UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping(path = "/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody CreateUserDTO createUserDTO, UriComponentsBuilder uriBuilder) {
