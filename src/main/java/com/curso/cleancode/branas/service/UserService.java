@@ -31,11 +31,11 @@ public class UserService {
     }
 
     public User getUser(String accountId) {
-        Optional<User> passenger = userRepository.accountId(accountId);
-        if(passenger.isEmpty()) {
+        Optional<User> user = userRepository.findByAccountId(accountId);
+        if(user.isEmpty()) {
             throw new UserNotFoundException("Usuário não encontrado");
         }
-        return passenger.get();
+        return user.get();
     }
 
     private void checkExistPassenger(String passengerEmail) {

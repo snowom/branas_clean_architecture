@@ -39,10 +39,9 @@ public class RideService {
         ride.setRideStatus(RideStatusEnum.STATUS_ACCEPTED.getRideStatus());
         ride.setDriverAccountId(acceptRideDTO.getAccountId());
         rideRepository.save(ride);
-        this.startRide(acceptRideDTO.getRideId());
     }
 
-    private void startRide(String rideId) {
+    public void startRide(String rideId) {
         Ride ride = this.getRide(rideId);
         this.isInProgressRide(ride);
         ride.setRideStatus(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus());
@@ -84,16 +83,15 @@ public class RideService {
     }
 
     private void checkValidRideStatus(String rideId) {
-        Optional<Ride> ride = rideRepository.findByRideId(rideId);
-        ride.orElseThrow(() -> new RideNotFoundException("A corrida escolhida não existe"));
-        if(!(ride.get().getRideStatus().equals(RideStatusEnum.STATUS_REQUESTED.getRideStatus()))) {
+        Ride ride = this.getRide(rideId);
+        if(!(ride.getRideStatus().equals(RideStatusEnum.STATUS_REQUESTED.getRideStatus()))) {
             throw new RideException("Não é possível aceitar uma corrida em progresso ou encerrada");
         }
     }
 
     public void isInProgressRide(Ride ride) {
-        if(!ride.getRideStatus().equals(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus())) {
-            throw new RideException("Falha ao realizar operação. A corrida deve estar em progresso");
+        if(!ride.getRideStatus().equals(RideStatusEnum.STATUS_ACCEPTED.getRideStatus())) {
+            throw new RideException("Não é possível começar uma corrida que não está aceita");
         }
     }
 }

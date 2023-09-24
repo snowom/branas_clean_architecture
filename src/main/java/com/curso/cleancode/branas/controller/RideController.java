@@ -35,6 +35,7 @@ public class RideController {
     @ResponseStatus(HttpStatus.OK)
     private void acceptRide(@Valid @RequestBody AcceptRideDTO acceptRideDTO) {
         rideService.acceptRide(acceptRideDTO);
+        rideService.startRide(acceptRideDTO.getRideId());
     }
 
     @PostMapping("/getRide")
