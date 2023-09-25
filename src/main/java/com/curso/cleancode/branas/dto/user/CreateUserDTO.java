@@ -21,6 +21,7 @@ public class CreateUserDTO {
     private String nome;
     @NotEmpty(message = "O campo email deve estar presente e não deve ser nulo")
     private String email;
+    @NotEmpty(message = "O campo cpf deve estar presente e não deve ser nulo")
     private String cpf;
     @NotNull(message = "O campo isPassenger deve estar presente e não deve ser nulo")
     private Boolean isPassenger;
