@@ -43,7 +43,7 @@ public class RideService {
 
     public void startRide(String rideId) {
         Ride ride = this.getRide(rideId);
-        this.isInProgressRide(ride);
+        this.isAcceptedRide(ride);
         ride.setRideStatus(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus());
         rideRepository.save(ride);
     }
@@ -89,7 +89,7 @@ public class RideService {
         }
     }
 
-    public void isInProgressRide(Ride ride) {
+    public void isAcceptedRide(Ride ride) {
         if(!ride.getRideStatus().equals(RideStatusEnum.STATUS_ACCEPTED.getRideStatus())) {
             throw new RideException("Não é possível começar uma corrida que não está aceita");
         }

@@ -90,7 +90,7 @@ public class RiderServiceTests extends MockitoExtension {
     public void test_is_in_progress_ride_success() {
         RideException rideException = Assertions.assertThrows(RideException.class, () -> {
             Ride ride = Ride.builder().rideStatus("").build();
-            rideService.isInProgressRide(ride);
+            rideService.isAcceptedRide(ride);
         });
         Assertions.assertEquals("Não é possível começar uma corrida que não está aceita", rideException.getMessage());
     }

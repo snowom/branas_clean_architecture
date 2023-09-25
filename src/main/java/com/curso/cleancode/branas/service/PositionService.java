@@ -24,7 +24,7 @@ public class PositionService {
     public void updateRidePosition(UpdatePositionDTO positionDTO) {
         this.validateLatLong(positionDTO.getLatitude(), positionDTO.getLongitude());
         Ride ride = this.rideService.getRide(positionDTO.getRideId());
-        this.rideService.isInProgressRide(ride);
+        this.rideService.isAcceptedRide(ride);
         Position position = this.createPosition(positionDTO);
         positionRepository.save(position);
     }
