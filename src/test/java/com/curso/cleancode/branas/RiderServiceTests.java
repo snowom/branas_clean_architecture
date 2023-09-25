@@ -19,7 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public class RiderServiceTests extends MockitoExtension {
@@ -55,7 +55,7 @@ public class RiderServiceTests extends MockitoExtension {
 
     @Test
     public void test_request_ride_success() {
-        RequestRideDTO mockRideDTO = new RequestRideDTO("123456", (float) 12.5, -12.1, -13.1, 14.1, 15.1);
+        RequestRideDTO mockRideDTO = new RequestRideDTO("123456", -12.1, -13.1, 14.1, 15.1);
         User mockPassenger = User.builder().isPassenger(true).build();
         Mockito.when(userService.getUser(Mockito.anyString())).thenReturn(mockPassenger);
         Mockito.when(rideRepository.countPassengerRidesWithStatusNotEquals(Mockito.anyString(), Mockito.anyString())).thenReturn(0);
@@ -66,7 +66,7 @@ public class RiderServiceTests extends MockitoExtension {
     @Test
     public void test_request_ride_fail_is_passanger() {
         UserException userException = Assertions.assertThrows(UserException.class, () -> {
-            RequestRideDTO mockRideDTO = new RequestRideDTO("123456", (float) 12.5, -12.1, -13.1, 14.1, 15.1);
+            RequestRideDTO mockRideDTO = new RequestRideDTO("123456", -12.1, -13.1, 14.1, 15.1);
             User mockPassenger = User.builder().isPassenger(false).build();
             Mockito.when(userService.getUser(Mockito.anyString())).thenReturn(mockPassenger);
             rideService.requestRide(mockRideDTO);
@@ -77,7 +77,7 @@ public class RiderServiceTests extends MockitoExtension {
     @Test
     public void test_request_ride_fail_pendding_ride() {
         RideException rideException = Assertions.assertThrows(RideException.class, () -> {
-            RequestRideDTO mockRideDTO = new RequestRideDTO("123456", (float) 12.5, -12.1, -13.1, 14.1, 15.1);
+            RequestRideDTO mockRideDTO = new RequestRideDTO("123456", -12.1, -13.1, 14.1, 15.1);
             User mockPassenger = User.builder().isPassenger(true).build();
             Mockito.when(userService.getUser(Mockito.anyString())).thenReturn(mockPassenger);
             Mockito.when(rideRepository.countPassengerRidesWithStatusNotEquals(Mockito.anyString(), Mockito.anyString())).thenReturn(1);
@@ -165,5 +165,32 @@ public class RiderServiceTests extends MockitoExtension {
             rideService.acceptRide(acceptRideDTO);
         });
         Assertions.assertEquals("Não é possível aceitar uma corrida em progresso ou encerrada", exception.getMessage());
+    }
+
+    @Test
+    public void test_finish_ride_success() {
+        String rideId = "12345";
+        Ride ride = Ride.builder()
+            .rideStatus(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus())
+            .fromLat(123.4)
+            .fromLong(432.5)
+            .toLat(789.2)
+            .toLong(947.6)
+            .build();
+        Mockito.when(rideRepository.findByRideId(rideId)).thenReturn(Optional.of(ride));
+        Ride result = rideService.finishRide(rideId);
+        Assertions.assertEquals(RideStatusEnum.STATUS_COMPLETED.getRideStatus(), result.getRideStatus());
+        Assertions.assertNotEquals(result.getFare(), BigDecimal.ZERO);
+    }
+
+    @Test
+    public void test_finish_ride_fail_invalid_ride_status() {
+        RideException exception = Assertions.assertThrows(RideException.class, () -> {
+            String rideId = "12345";
+            Ride ride = Ride.builder().rideStatus(RideStatusEnum.STATUS_REQUESTED.getRideStatus()).build();
+            Mockito.when(rideRepository.findByRideId(rideId)).thenReturn(Optional.of(ride));
+            rideService.finishRide(rideId);
+        });
+        Assertions.assertEquals("A corrida deve estar em progresso para ser finalizada.", exception.getMessage());
     }
 }

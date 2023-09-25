@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity(name = "ride")
@@ -26,7 +27,7 @@ public class Ride {
     @Column(name = "status")
     private String rideStatus;
     @Column(name = "fare")
-    private Float fare;
+    private BigDecimal fare;
     @Column(name = "distance")
     private Float distance;
     @Column(name = "from_lat")

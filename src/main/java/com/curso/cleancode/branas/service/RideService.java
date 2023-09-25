@@ -9,7 +9,9 @@ import com.curso.cleancode.branas.exceptions.UserException;
 import com.curso.cleancode.branas.model.Ride;
 import com.curso.cleancode.branas.model.User;
 import com.curso.cleancode.branas.repository.RideRepository;
+import com.curso.cleancode.branas.utils.RideUtils;
 import org.springframework.stereotype.Service;
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -48,6 +50,33 @@ public class RideService {
         rideRepository.save(ride);
     }
 
+    public Ride getRide(String rideId) {
+        Optional<Ride> ride = rideRepository.findByRideId(rideId);
+        ride.orElseThrow(() -> new RideNotFoundException("A corrida informada não foi localizada"));
+        return ride.get();
+    }
+
+    public Ride finishRide(String rideId) {
+        Ride ride = this.getRide(rideId);
+        this.checkIsInProgressRide(ride);
+        Float distanceRide = RideUtils.calculateKilometerDistance(ride.getFromLat(), ride.getFromLong(), ride.getToLat(), ride.getToLong());
+        BigDecimal fare = this.calculateTotalRideFare(distanceRide);
+        ride.setRideStatus(RideStatusEnum.STATUS_COMPLETED.getRideStatus());
+        ride.setFare(fare);
+        rideRepository.save(ride);
+        return ride;
+    }
+
+    private void checkIsInProgressRide(Ride ride) {
+        if(!ride.getRideStatus().equals(RideStatusEnum.STATUS_IN_PROGRESS.getRideStatus())) {
+            throw new RideException("A corrida deve estar em progresso para ser finalizada.");
+        }
+    }
+
+    private BigDecimal calculateTotalRideFare(Float totalDistanceRide) {
+        return BigDecimal.valueOf(totalDistanceRide * 2.1);
+    }
+
     private void checkIsPassenger(String accountId) {
         User user = userService.getUser(accountId);
         if(!user.getIsPassenger()) {
@@ -60,12 +89,6 @@ public class RideService {
         if(rides>0) {
             throw new RideException("O passageiro possui corridas pendentes ou em execução");
         }
-    }
-
-    public Ride getRide(String rideId) {
-        Optional<Ride> ride = rideRepository.findByRideId(rideId);
-        ride.orElseThrow(() -> new RideNotFoundException("A corrida informada não foi localizada"));
-        return ride.get();
     }
 
     private void checkIsDriver(String accountId) {

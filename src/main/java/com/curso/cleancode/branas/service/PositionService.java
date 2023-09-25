@@ -22,17 +22,13 @@ public class PositionService {
     }
 
     public void updateRidePosition(UpdatePositionDTO positionDTO) {
-        this.validateLatLong(positionDTO.getLatitude(), positionDTO.getLongitude());
+        if (positionDTO.getLatitude() == null || positionDTO.getLongitude() == null) {
+            throw new RideException("Falha ao atualizar localização. Valores de latitude ou longitude incorretos.");
+        }
         Ride ride = this.rideService.getRide(positionDTO.getRideId());
         this.rideService.isAcceptedRide(ride);
         Position position = this.createPosition(positionDTO);
         positionRepository.save(position);
-    }
-
-    private void validateLatLong(Double latitude, Double longitude) {
-        if (latitude == null || longitude == null) {
-            throw new RideException("Falha ao atualizar localização. Valores de latitude ou longitude incorretos.");
-        }
     }
 
     private Position createPosition(UpdatePositionDTO positionDTO) {

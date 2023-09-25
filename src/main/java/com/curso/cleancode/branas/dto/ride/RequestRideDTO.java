@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
@@ -17,7 +18,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RequestRideDTO {
     private String passengerId;
-    private Float fare;
     private Double fromLat;
     private Double fromLong;
     private Double toLat;
@@ -28,7 +28,7 @@ public class RequestRideDTO {
             .rideId(UUID.randomUUID().toString())
             .passengerAccountId(rideDTO.passengerId)
             .rideStatus(RideStatusEnum.STATUS_REQUESTED.getRideStatus())
-            .fare(rideDTO.fare)
+            .fare(BigDecimal.ZERO)
             .fromLat(rideDTO.fromLat)
             .fromLong(rideDTO.fromLong)
             .toLat(rideDTO.toLat)

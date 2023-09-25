@@ -5,6 +5,7 @@ import com.curso.cleancode.branas.dto.ride.GetRideDTO;
 import com.curso.cleancode.branas.dto.ride.RequestRideDTO;
 import com.curso.cleancode.branas.model.Ride;
 import com.curso.cleancode.branas.service.RideService;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,5 +43,10 @@ public class RideController {
     private ResponseEntity<Ride> getRide(@Valid @RequestBody GetRideDTO getRideDTO) {
         Ride ride = rideService.getRide(getRideDTO.getRideId());
         return ResponseEntity.ok().body(ride);
+    }
+
+    @PostMapping("/finish")
+    private void finishRide(@Valid @RequestBody @JsonProperty("ride_id") String rideId) {
+        rideService.finishRide(rideId);
     }
 }
